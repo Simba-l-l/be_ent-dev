@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 import { connectWalletBeacon, connectWalletTemple, DAppConnection } from './wallet';
+import {Box, Button, Card, CardContent, CardHeader, Container, Divider, Grid, Select} from "@mui/material";
 
 const networksTokensData = {
   mainnet: {
@@ -33,11 +34,11 @@ function App() {
   const connectWallet = async (connectionType: DAppConnection['type']) => {
     try {
       const connection = connectionType === 'temple'
-        ? await connectWalletTemple(true, network)
-        : await connectWalletBeacon(
-          true,
-          { type: network === 'mainnet' ? BeaconNetworkType.MAINNET : BeaconNetworkType.HANGZHOUNET }
-        );
+          ? await connectWalletTemple(true, network)
+          : await connectWalletBeacon(
+              true,
+              { type: network === 'mainnet' ? BeaconNetworkType.MAINNET : BeaconNetworkType.HANGZHOUNET }
+          );
 
       setConnection(connection);
     } catch (e) {
@@ -69,19 +70,19 @@ function App() {
       const { address, id, decimals } = networksTokensData[network];
       const tokenContract = await tezos.wallet.at(address);
       const op = await tokenContract.methods
-        .transfer([
-          {
-            from_: pkh,
-            txs: [
-              {
-                to_: AUTHOR_ADDRESS,
-                token_id: id,
-                amount: new BigNumber(10).pow(decimals).times(2),
-              },
-            ],
-          },
-        ])
-        .send();
+          .transfer([
+            {
+              from_: pkh,
+              txs: [
+                {
+                  to_: AUTHOR_ADDRESS,
+                  token_id: id,
+                  amount: new BigNumber(10).pow(decimals).times(2),
+                },
+              ],
+            },
+          ])
+          .send();
       alert('Thank you, the donation is being processed!');
       await op.confirmation(1);
       alert('Donation has been processed successfully!');
@@ -97,28 +98,52 @@ function App() {
   };
 
   return (
-    <div>
-      {connection ? (
-        <>
-          <span>Network: {network}</span>
-          <button onClick={resetConnection}>
-            {connection.pkh}
-          </button>
-          <button onClick={donate}>
-            Donate some {networksTokensData[network].name}
-          </button>
-        </>
-      ) : (
-        <>
-          <select name="network" value={network} onChange={handleNetworkChange}>
-            <option value="mainnet">Mainnet</option>
-            <option value="hangzhounet">Hangzhounet</option>
-          </select>
-          <button onClick={handleConnectTempleClick}>Connect Temple Wallet</button>
-          <button onClick={handleConnectBeaconClick}>Connect with Beacon</button>
-        </>
-      )}
-    </div>
+      <div>
+        {connection ? (
+            <>
+              <span>Network: {network}</span>
+              <button onClick={resetConnection}>
+                {connection.pkh}
+              </button>
+              <button onClick={donate}>
+                Donate some {networksTokensData[network].name}
+              </button>
+            </>
+        ) : (
+            <>
+            <Container maxWidth="lg">
+                <Grid
+                    container
+                    direction="row"
+                    justifyContent="center"
+                    alignItems="stretch"
+                    spacing={3}
+                >
+                  <Grid item xs={6}>
+                    <Card>
+                      <CardHeader title="Connection" />
+                      <Divider/>
+                      <CardContent>
+                        <Box>
+                            <select name="network" style={{height: '30px', width : '300px'}} value={network} onChange={handleNetworkChange}>
+                              <option value="mainnet">Mainnet</option>
+                              <option value="hangzhounet">Hangzhounet</option>
+                            </select>
+                          <div>
+                            <Button onClick={handleConnectTempleClick} sx={{ margin: 1 }} variant="contained" style={{height: '30px', width : '300px'}}>Connect Temple Wallet</Button>
+                          </div>
+                          <div>
+                            <Button onClick={handleConnectBeaconClick} sx={{ margin: 1 }} variant="contained" style={{height: '30px', width : '300px'}}>Connect with Beacon</Button>
+                          </div>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </Grid>
+              </Container>
+            </>
+        )}
+      </div>
   );
 }
 
