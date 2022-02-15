@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import { connectWalletBeacon, DAppConnection } from './wallet';
 
-
+/*dfsgjshdkgsd*/
 function App() {
   const [connection, setConnection] = useState<DAppConnection>()
   const handleConnectClick = async () => {
